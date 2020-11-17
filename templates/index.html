@@ -39,10 +39,10 @@
             <%= name %>
         </td>
         <td style="width:21%">
-            <%= start_date %>
+            <%= start_date_time_only %>
         </td>
         <td style="width:21%">
-            <%= end_date %>
+            <%= end_date_time_only %>
         </td>
         <td style="width:13%">
             <%= duration %>
@@ -203,19 +203,19 @@
                                     </div>
                                     <div id="manul_date">
                                         <div class="form-group row start_date">
-                                            <label class="col-4 col-form-label">Start Date</label>
+                                            <label class="col-4 col-form-label">Start Time</label>
                                             <div class="controls col-7">
                                                 <input class="form-control date" name="start_date_date" type="text"
-                                                       style="margin-right:5px"/>
+                                                       style="margin-right:5px; display: none" disabled/>
                                                 <input class="form-control time" name="start_date_time" type="text"/>
                                             </div>
                                             <input name="start_date" type="hidden"/>
                                         </div>
                                         <div class="form-group row end_date">
-                                            <label class="col-4 col-form-label">End Date</label>
+                                            <label class="col-4 col-form-label">End Time</label>
                                             <div class="controls col-7">
                                                 <input class="form-control date" name="end_date_date" type="text"
-                                                       style="margin-right:5px"/>
+                                                       style="margin-right:5px; display: none" disabled/>
                                                 <input class="form-control time" name="end_date_time" type="text"/>
                                             </div>
                                             <input name="end_date" type="hidden"/>
@@ -334,8 +334,8 @@
                         <thead class="table-borderless">
                         <tr>
                             <th class="text-secondary font-weight-normal asset_row_name">Name</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">Start</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">End</th>
+                            <th class="text-secondary font-weight-normal" style="width:21%">Start Time</th>
+                            <th class="text-secondary font-weight-normal" style="width:21%">End Time</th>
                             <th class="text-secondary font-weight-normal" style="width:13%">Duration</th>
                             <th class="text-secondary font-weight-normal" style="width:7%">Activity</th>
                             <th class="text-secondary font-weight-normal" style="width:13%"></th>
@@ -355,8 +355,8 @@
                         <thead class="table-borderless">
                         <tr>
                             <th class="text-secondary font-weight-normal asset_row_name">Name</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">Start</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">End</th>
+                            <th class="text-secondary font-weight-normal" style="width:21%">Start Time</th>
+                            <th class="text-secondary font-weight-normal" style="width:21%">End Time</th>
                             <th class="text-secondary font-weight-normal" style="width:13%">Duration</th>
                             <th class="text-secondary font-weight-normal" style="width:7%">Activity</th>
                             <th class="text-secondary font-weight-normal" style="width:13%"></th>

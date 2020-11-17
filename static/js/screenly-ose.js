@@ -847,9 +847,14 @@
         name: insertWbr(truncate_str(json.name)),
         duration: durationSecondsToHumanReadable(json.duration),
         start_date: (date_to(json.start_date)).string(),
-        end_date: (date_to(json.end_date)).string()
+        start_date_time_only: (date_to(json.start_date)).string().substring(11,19),
+        end_date: (date_to(json.end_date)).string(),
+        end_date_time_only: (date_to(json.end_date)).string().substring(11,19)
       })));
       this.$el.prop('id', this.model.get('asset_id'));
+      if (!this.model.get('is_active')) {
+        this.$el.prop('style', 'color: red');
+      }
       (this.$(".delete-asset-button")).popover({
         content: get_template('confirm-delete')
       });

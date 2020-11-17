@@ -31,7 +31,7 @@ def is_active(asset, at_time=None):
 
     if asset['is_enabled'] and asset['start_date'] and asset['end_date']:
         at = at_time or get_time()
-        return 1 if asset['start_date'] < at < asset['end_date'] else 0
+        return 1 if asset['start_date'].time() < at.time() < asset['end_date'].time() else 0
     return 0
 
 

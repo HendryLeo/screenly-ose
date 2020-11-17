@@ -483,9 +483,13 @@ API.View.AssetRowView = class AssetRowView extends Backbone.View
     @$el.html @template _.extend json = @model.toJSON(),
       name: insertWbr truncate_str json.name # word break urls at slashes
       duration: durationSecondsToHumanReadable(json.duration)
-      start_date: (date_to json.start_date).string()
-      end_date: (date_to json.end_date).string()
+      start_date: (date_to json.start_date).string(),
+      start_date_time_only: (date_to json.start_date).string().substring(11,19),
+      end_date: (date_to json.end_date).string(),
+      end_date_time_only: (date_to json.end_date).string().substring(11,19)
     @$el.prop 'id', @model.get 'asset_id'
+    if (!@model.get 'is_active')
+      @$el.prop 'style', 'color: red'
     (@$ ".delete-asset-button").popover content: get_template 'confirm-delete'
     (@$ ".toggle input").prop "checked", @model.get 'is_enabled'
     (@$ ".asset-icon").addClass switch @model.get "mimetype"

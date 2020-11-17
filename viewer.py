@@ -26,6 +26,7 @@ from settings import settings, LISTEN, PORT, ZmqConsumer
 from lib import assets_helper, html_templates
 from lib import db
 from lib.diagnostics import get_git_branch, get_git_short_hash
+from lib.diagnostics import get_raspberry_code, get_raspberry_model
 from lib.github import fetch_remote_hash, remote_branch_available
 from lib.errors import SigalrmException
 from lib.utils import get_active_connections, url_fails, touch, is_balena_app, is_ci, get_node_ip
@@ -342,7 +343,13 @@ def view_video(uri, duration):
 
     if arch in ('armv6l', 'armv7l'):
         player_args = ['omxplayer', uri]
-        player_kwargs = {'o': settings['audio_output'], '_bg': True, '_ok_code': [0, 124, 143]}
+        player_kwargs = {'w': True, 'o': settings['audio_output'], '_bg': True, '_ok_code': [0, 124, 143]}
+        raspberry_code = get_raspberry_code()
+        if get_raspberry_model(raspberry_code) == 'Model 4B':
+            if settings['audio_output'] == 'hdmi':
+                player_kwargs1 = {'w': True, 'display': '7', 'o': 'hdmi1', '_bg': True, '_ok_code': [0, 124, 143]}
+            else:
+                player_kwargs1 = {'w': True, 'display': '7', 'n': '-1', '_bg': True, '_ok_code': [0, 124, 143]}
     else:
         player_args = ['mplayer', uri, '-nosound']
         player_kwargs = {'_bg': True, '_ok_code': [0, 124]}
@@ -351,6 +358,8 @@ def view_video(uri, duration):
         player_args = ['timeout', VIDEO_TIMEOUT + int(duration.split('.')[0])] + player_args
 
     run = sh.Command(player_args[0])(*player_args[1:], **player_kwargs)
+    if get_raspberry_model(raspberry_code) == 'Model 4B':
+        run1 = sh.Command(player_args[0])(*player_args[1:], **player_kwargs1)
 
     browser_clear(force=True)
     try:

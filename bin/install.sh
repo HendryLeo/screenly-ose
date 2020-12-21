@@ -1,29 +1,32 @@
 #!/bin/bash -e
 
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+# -*- sh-basic-offset: 4 -*-
+
 WEB_UPGRADE=false
 BRANCH_VERSION=
 MANAGE_NETWORK=
 UPGRADE_SYSTEM=
 
 if [ -f .env ]; then
-  source .env
+    source .env
 fi
 
 while getopts ":w:b:n:s:" arg; do
-  case "${arg}" in
-    w)
-      WEB_UPGRADE=true
-      ;;
-    b)
-      BRANCH_VERSION=${OPTARG}
-      ;;
-    n)
-      MANAGE_NETWORK=${OPTARG}
-      ;;
-    s)
-      UPGRADE_SYSTEM=${OPTARG}
-      ;;
-  esac
+    case "${arg}" in
+        w)
+            WEB_UPGRADE=true
+        ;;
+        b)
+            BRANCH_VERSION=${OPTARG}
+        ;;
+        n)
+            MANAGE_NETWORK=${OPTARG}
+        ;;
+        s)
+            UPGRADE_SYSTEM=${OPTARG}
+        ;;
+    esac
 done
 
 if [ "$WEB_UPGRADE" = false ]; then
@@ -36,7 +39,7 @@ if [ "$WEB_UPGRADE" = false ]; then
 
   # clear screen
   clear;
-  
+
   # Set color of logo
   tput setaf 6
   tput bold
@@ -64,7 +67,6 @@ echo -e "\n________________________________________\n"
 echo -e "Which version/branch of Screenly OSE would you like to install:\n"
 echo " Press (1) for the Production branch, which is the latest stable."
 echo " Press (2) for the Development/Master branch, which has the latest features and fixes, but things may break."
-echo " Press (3) for the Experimental branch, which contains the last major changes, such as the new browser and migrating to Docker."
 echo ""
 
 read -n 1 -r -s BRANCHSELECTION
@@ -72,8 +74,6 @@ case $BRANCHSELECTION in
   1) echo "You selected: Production";export DOCKER_TAG="production";BRANCH="production"
     ;;
   2) echo "You selected: Development/Master";export DOCKER_TAG="latest";BRANCH="master"
-    ;;
-  3) echo "You selected: Experimental";export DOCKER_TAG="experimental";BRANCH="experimental"
     ;;
   *) echo "(Error) That was not an option, installer will now exit.";exit
     ;;
@@ -83,9 +83,7 @@ esac
 
   echo && read -p "Would you like to perform a full system upgrade as well? (y/N)" -n 1 -r -s UPGRADE && echo
   if [ "$UPGRADE" != 'y' ]; then
-    EXTRA_ARGS="--skip-tags enable-ssl,system-upgrade"
-  else
-    EXTRA_ARGS="--skip-tags enable-ssl"
+      EXTRA_ARGS=("--skip-tags" "system-upgrade")
   fi
 
 elif [ "$WEB_UPGRADE" = true ]; then
@@ -112,9 +110,7 @@ elif [ "$WEB_UPGRADE" = true ]; then
   fi
 
   if [ "$UPGRADE_SYSTEM" = false ]; then
-    EXTRA_ARGS="--skip-tags enable-ssl,system-upgrade"
-  elif [ "$UPGRADE_SYSTEM" = true ]; then
-    EXTRA_ARGS="--skip-tags enable-ssl"
+      EXTRA_ARGS=("--skip-tags" "system-upgrade")
   else
     echo -e "Invalid -s parameter."
     exit 1
@@ -149,21 +145,24 @@ sudo mkdir -p /etc/ansible
 echo -e "[local]\nlocalhost ansible_connection=local" | sudo tee /etc/ansible/hosts > /dev/null
 
 if [ ! -f /etc/locale.gen ]; then
-  # No locales found. Creating locales with default UK/US setup.
-  echo -e "en_GB.UTF-8 UTF-8\nen_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen > /dev/null
-  sudo locale-gen
+    # No locales found. Creating locales with default UK/US setup.
+    echo -e "en_GB.UTF-8 UTF-8\nen_US.UTF-8 UTF-8" | sudo tee /etc/locale.gen > /dev/null
+    sudo locale-gen
 fi
 
 sudo sed -i 's/apt.screenlyapp.com/archive.raspbian.org/g' /etc/apt/sources.list
 sudo apt update -y
-sudo apt-get purge -y python-setuptools python-pip python-pyasn1
-sudo apt-get install -y python-dev git-core libffi-dev libssl-dev whois
+sudo apt-get purge -y \
+    python-setuptools \
+    python-pip \
+    python-pyasn1
+sudo apt-get install -y \
+    python-dev \
+    git-core \
+    libffi-dev \
+    libssl-dev \
+    whois
 curl -s https://bootstrap.pypa.io/get-pip.py | sudo python
-
-# users who chose experimental and then reverted back to master or production need docker removed
-if [ "$BRANCH" != "experimental" ]; then
-	sudo apt-get purge -y docker-ce docker-ce-cli containerd.io > /dev/null
-fi
 
 if [ "$NETWORK" == 'y' ]; then
   export MANAGE_NETWORK=true
@@ -174,18 +173,60 @@ fi
 
 sudo pip install ansible==2.8.8
 
-sudo -u pi ansible localhost -m git -a "repo=$REPOSITORY dest=/home/pi/screenly version=$BRANCH force=yes"
+sudo -u pi ansible localhost \
+    -m git \
+    -a "repo=$REPOSITORY dest=/home/pi/screenly version=$BRANCH force=no"
 cd /home/pi/screenly/ansible
 
-sudo -E ansible-playbook site.yml $EXTRA_ARGS
+sudo -E ansible-playbook site.yml "${EXTRA_ARGS[@]}"
+
+sudo -E docker-compose \
+    -f /home/pi/screenly/docker-compose.yml \
+    -f /home/pi/screenly/docker-compose.override.yml \
+    pull
+
+sudo -E docker-compose \
+    -f /home/pi/screenly/docker-compose.yml \
+    -f /home/pi/screenly/docker-compose.override.yml \
+    up -d
 
 sudo apt-get autoclean
 sudo apt-get clean
-sudo find /usr/share/doc -depth -type f ! -name copyright -delete
-sudo find /usr/share/doc -empty -delete
-sudo rm -rf /usr/share/man /usr/share/groff /usr/share/info/* /usr/share/lintian /usr/share/linda /var/cache/man
-sudo find /usr/share/locale -type f ! -name 'en' ! -name 'de*' ! -name 'es*' ! -name 'ja*' ! -name 'fr*' ! -name 'zh*' -delete
-sudo find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en*' ! -name 'de*' ! -name 'es*' ! -name 'ja*' ! -name 'fr*' ! -name 'zh*' ! -name 'locale.alias' -exec rm -r {} \;
+sudo apt autoremove -y
+sudo find /usr/share/doc \
+    -depth \
+    -type f \
+    ! -name copyright \
+    -delete
+sudo find /usr/share/doc \
+    -empty \
+    -delete
+sudo rm -rf \
+    /usr/share/man \
+    /usr/share/groff \
+    /usr/share/info/* \
+    /usr/share/lintian \
+    /usr/share/linda /var/cache/man
+sudo find /usr/share/locale \
+    -type f \
+    ! -name 'en' \
+    ! -name 'de*' \
+    ! -name 'es*' \
+    ! -name 'ja*' \
+    ! -name 'fr*' \
+    ! -name 'zh*' \
+    -delete
+sudo find /usr/share/locale \
+    -mindepth 1 \
+    -maxdepth 1 \
+    ! -name 'en*' \
+    ! -name 'de*' \
+    ! -name 'es*' \
+    ! -name 'ja*' \
+    ! -name 'fr*' \
+    ! -name 'zh*' \
+    ! -name 'locale.alias' \
+    -exec rm -r {} \;
 
 cd /home/pi/screenly && git rev-parse HEAD > /home/pi/.screenly/latest_screenly_sha
 sudo chown -R pi:pi /home/pi
@@ -199,33 +240,35 @@ else
   sudo chmod 0440 /etc/sudoers.d/010_pi-nopasswd
 fi
 
-#######################################################################
-# Setup a new pi password if default password "raspberry" detected
+# Ask user to set a new pi password if default password "raspberry" detected
+check_defaultpw () {
+    if [ "$BRANCH" = "master" ] || [ "$BRANCH" = "production" ] && [ "$WEB_UPGRADE" = false ]; then
+        set +x
 
-if [ "$BRANCH" = "master" ] || [ "$BRANCH" = "production" ] && [ "$WEB_UPGRADE" = false ]; then
-set +x
-# clear any previous set variables used for password detection
-_CURRENTPISALT=''
-_CURRENTPIUSERPWD=''
-_DEFAULTPIPWD=''
+        # currently only looking for $6$/sha512 hash
+        local VAR_CURRENTPISALT
+        local VAR_CURRENTPIUSERPW
+        local VAR_DEFAULTPIPW
+        VAR_CURRENTPISALT=$(sudo cat /etc/shadow | grep pi | awk -F '$' '{print $3}')
+        VAR_CURRENTPIUSERPW=$(sudo cat /etc/shadow | grep pi | awk -F ':' '{print $2}')
+        VAR_DEFAULTPIPW=$(mkpasswd -m sha-512 raspberry "$VAR_CURRENTPISALT")
 
-# currently only looking for $6$/sha512, will expand later on to all algorithms potentially used
-_CURRENTPISALT=$(sudo cat /etc/shadow | grep pi | awk -F '$' '{print $3}')
-_CURRENTPIUSERPWD=$(sudo cat /etc/shadow | grep pi | awk -F ':' '{print $2}')
-_DEFAULTPIPWD=$(mkpasswd -m sha-512 raspberry $_CURRENTPISALT)
+        if [[ "$VAR_CURRENTPIUSERPW" == "$VAR_DEFAULTPIPW" ]]; then
+            echo "Warning: The default Raspberry Pi password was detected!"
+            read -p "Do you still want to change it? (y/N)" -n 1 -r -s PWD_CHANGE
+            if [ "$PWD_CHANGE" = 'y' ]; then
+                set +e
+                passwd
+                set -ex
+            fi
+        else
+            echo "The default raspberry pi password was not detected, continuing with installation..."
+            set -x
+        fi
+    fi
+}
 
-  if [[ "$_CURRENTPIUSERPWD" == "$_DEFAULTPIPWD" ]]; then
-    echo "(Warning): The default raspberry pi password was detected! - please change it now..."
-    set +e
-    passwd
-    set -e
-    set -x
-  else
-    echo "The default raspberry pi password was not detected, continuing with installation..."
-    set -x
-  fi
-fi
-#######################################################################
+check_defaultpw;
 
 echo -e "Screenly version: $(git rev-parse --abbrev-ref HEAD)@$(git rev-parse --short HEAD)\n$(lsb_release -a)" > ~/version.md
 

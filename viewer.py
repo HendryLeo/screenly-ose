@@ -28,6 +28,7 @@ from lib import db
 from lib.diagnostics import get_git_branch, get_git_short_hash
 from lib.github import fetch_remote_hash, remote_branch_available
 from lib.errors import SigalrmException
+from lib.media_player import VLCMediaPlayer, OMXMediaPlayer
 from lib.utils import get_active_connections, url_fails, touch, is_balena_app, is_ci, get_node_ip
 
 
@@ -53,6 +54,11 @@ loop_is_stopped = False
 
 VIDEO_TIMEOUT = 20  # secs
 
+try:
+    media_player = VLCMediaPlayer() if get_raspberry_model(get_raspberry_code()) == 'Model 4B' else OMXMediaPlayer()
+except sh.ErrorReturnCode_1:
+    media_player = OMXMediaPlayer()
+
 HOME = None
 arch = None
 db_conn = None
@@ -74,10 +80,7 @@ def sigusr1(signum, frame):
     omxplayer is killed to skip any currently playing video assets.
     """
     logging.info('USR1 received, skipping.')
-    try:
-        sh.killall('omxplayer.bin', _ok_code=[1])
-    except OSError:
-        pass
+    media_player.stop()
 
 
 def skip_asset(back=False):
@@ -340,27 +343,19 @@ def view_image(uri):
 def view_video(uri, duration):
     logging.debug('Displaying video %s for %s ', uri, duration)
 
-    if arch in ('armv6l', 'armv7l'):
-        player_args = ['omxplayer', uri]
-        player_kwargs = {'o': settings['audio_output'], '_bg': True, '_ok_code': [0, 124, 143]}
-    else:
-        player_args = ['mplayer', uri, '-nosound']
-        player_kwargs = {'_bg': True, '_ok_code': [0, 124]}
+    media_player.set_asset(uri, duration)
+    media_player.play()
 
-    if duration and duration != 'N/A':
-        player_args = ['timeout', VIDEO_TIMEOUT + int(duration.split('.')[0])] + player_args
+    view_image(BLACK_PAGE)
 
-    run = sh.Command(player_args[0])(*player_args[1:], **player_kwargs)
-
-    browser_clear(force=True)
     try:
-        while run.process.alive:
+        while media_player.is_playing():
             watchdog()
             sleep(1)
-        if run.exit_code == 124:
-            logging.error('omxplayer timed out')
     except sh.ErrorReturnCode_1:
         logging.info('Resource URI is not correct, remote host is not responding or request was rejected.')
+
+    media_player.stop()
 
 
 def check_update():

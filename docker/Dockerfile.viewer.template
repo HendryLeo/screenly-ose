@@ -10,6 +10,7 @@ RUN apt-get update && \
         matchbox \
         net-tools \
         omxplayer \
+        vlc \
         psmisc \
         python-dev \
         python-imaging \

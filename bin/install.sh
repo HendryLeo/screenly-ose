@@ -192,6 +192,7 @@ sudo -E docker-compose \
 
 sudo apt-get autoclean
 sudo apt-get clean
+sudo docker system prune -y
 sudo apt autoremove -y
 sudo find /usr/share/doc \
     -depth \
@@ -228,14 +229,11 @@ sudo find /usr/share/locale \
     ! -name 'locale.alias' \
     -exec rm -r {} \;
 
-cd /home/pi/screenly && git rev-parse HEAD > /home/pi/.screenly/latest_screenly_sha
 sudo chown -R pi:pi /home/pi
 
-# Need a password for commands with sudo
-if [ "$BRANCH" = "master" ] || [ "$BRANCH" = "production" ]; then
-  sudo rm -f /etc/sudoers.d/010_pi-nopasswd
-else
-  # Temporarily necessary because web upgrade only for the master branch
+
+# Run sudo w/out password
+if [ ! -f /etc/sudoers.d/010_pi-nopasswd ]; then
   echo "pi ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/010_pi-nopasswd > /dev/null
   sudo chmod 0440 /etc/sudoers.d/010_pi-nopasswd
 fi

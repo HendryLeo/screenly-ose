@@ -224,7 +224,15 @@ def get_raspberry_model(raspberry_code):
         'c03111': 'Model 4B',
         '900061': 'Model CM',
         'a220a0': 'Model CM3',
-        'a02100': 'Model CM3+'
+        'a02100': 'Model CM3+',
+        'a03111': 'Model 4B',
+        'b03111': 'Model 4B',
+        'b03112': 'Model 4B',
+        'b03114': 'Model 4B',
+        'c03111': 'Model 4B',
+        'c03112': 'Model 4B',
+        'd03114': 'Model 4B',
+        'c03130': 'Model Pi 400'
     }
 
     return models.get(raspberry_code, 'Unable to determine raspberry model.')
@@ -260,7 +268,15 @@ def get_raspberry_revision(raspberry_code):
         'c03111': '1.1',
         '900061': '1.1',
         'a220a0': '1.0',
-        'a02100': '1.0'
+        'a02100': '1.0',
+        'a03111': '1.1',
+        'b03111': '1.1',
+        'b03112': '1.2',
+        'b03114': '1.4',
+        'c03111': '1.1',
+        'c03112': '1.2',
+        'd03114': '1.4',
+        'c03130': '1'
     }
 
     return revisions.get(raspberry_code, 'Unable to determine raspberry revision.')
@@ -296,7 +312,15 @@ def get_raspberry_ram(raspberry_code):
         'c03111': '4GB',
         '900061': '512MB',
         'a220a0': '1GB',
-        'a02100': '1GB'
+        'a02100': '1GB',
+        'a03111': '1GB',
+        'b03111': '2GB',
+        'b03112': '2GB',
+        'b03114': '2GB',
+        'c03111': '4GB',
+        'c03112': '4GB',
+        'd03114': '8GB',
+        'c03130': '4GB'
     }
 
     return rams.get(raspberry_code, 'Unable to determine raspberry RAM.')
@@ -332,7 +356,15 @@ def get_raspberry_manufacturer(raspberry_code):
         'c03111': 'Sony UK',
         '900061': 'Sony UK',
         'a220a0': 'Embest',
-        'a02100': 'Sony UK'
+        'a02100': 'Sony UK',
+        'a03111': 'Sony UK',
+        'b03111': 'Sony UK',
+        'b03112': 'Sony UK',
+        'b03114': 'Sony UK',
+        'c03111': 'Sony UK',
+        'c03112': 'Sony UK',
+        'd03114': 'Sony UK',
+        'c03130': 'Sony UK'
     }
 
     return manufacturers.get(raspberry_code, 'Unable to determine raspberry manufacturer.')

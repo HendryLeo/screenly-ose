@@ -26,6 +26,7 @@ from settings import settings, LISTEN, PORT, ZmqConsumer
 from lib import assets_helper, html_templates
 from lib import db
 from lib.diagnostics import get_git_branch, get_git_short_hash
+from lib.diagnostics import get_raspberry_code, get_raspberry_model
 from lib.github import fetch_remote_hash, remote_branch_available
 from lib.errors import SigalrmException
 from lib.media_player import VLCMediaPlayer, OMXMediaPlayer

@@ -106,6 +106,20 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="form-inline">
+                            <label>Enable Second Screen (RPI-4 only, require viewer restart)</label>
+                            <div class="ml-auto">
+                                <label id="enable_second_screen_checkbox"
+                                       class="is_enabled-toggle toggle switch-light switch-ios small m-0">
+                                    {% if context.enable_second_screen %}
+                                        <input name="enable_second_screen" checked="checked" type="checkbox">
+                                    {% else %}
+                                        <input name="enable_second_screen" type="checkbox">
+                                    {% endif %}
+                                    <span><span></span><span></span><a></a></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group col-6 d-flex flex-column justify-content-between">
@@ -122,7 +136,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="small text-secondary">Audio output</label>
+                            <label class="small text-secondary">Audio output (There is a bug with raspbian when dual HDMI is detected, analog output is not working)</label>
                             <select class="form-control" name="audio_output">
                                 {% if context.audio_output == 'hdmi' %}
                                     <option value="hdmi" selected="selected">HDMI</option>
@@ -186,7 +200,19 @@
                                 {% endfor %}
                             </select>
                         </div>
-                    </div>
+                        <div class="form-group mb-0">
+                            <label class="small text-secondary">Media Player (Changing this require viewer restart)</label>
+                            <select class="form-control" name="media_player">
+                                {% if context.media_player == 'omxplayer' %}
+                                    <option value="omxplayer" selected="selected">OMXPlayer</option>
+                                    <option value="vlc">VLC</option>
+                                {% else %}
+                                    <option value="omxplayer">OMXPlayer</option>
+                                    <option value="vlc" selected="selected">VLC</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                </div>
 
                     <div class="form-group col-6 offset-6">
                         {% if context.need_current_password %}

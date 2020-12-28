@@ -38,7 +38,8 @@ DEFAULTS = {
         'verify_ssl': True,
         'usb_assets_key': '',
         'default_assets': False,
-        'enable_second_screen': False
+        'enable_second_screen': False,
+        'media_player': 'omxplayer'
     }
 }
 CONFIGURABLE_SETTINGS = DEFAULTS['viewer'].copy()

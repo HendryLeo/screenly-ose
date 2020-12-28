@@ -78,7 +78,7 @@ def sigusr1(signum, frame):
     """
     The signal interrupts sleep() calls, so the currently
     playing web or image asset is skipped.
-    omxplayer is killed to skip any currently playing video assets.
+    media player is killed to skip any currently playing video assets.
     """
     logging.info('USR1 received, skipping.')
     media_player.stop()
@@ -344,10 +344,10 @@ def view_image(uri):
 def view_video(uri, duration):
     logging.debug('Displaying video %s for %s ', uri, duration)
 
+    view_image(BLACK_PAGE)
+
     media_player.set_asset(uri, duration)
     media_player.play()
-
-    view_image(BLACK_PAGE)
 
     try:
         while media_player.is_playing():
@@ -468,7 +468,7 @@ def asset_loop(scheduler):
 
 
 def setup():
-    global HOME, arch, db_conn
+    global HOME, arch, db_conn, media_player
     HOME = getenv('HOME', '/home/pi')
     arch = machine()
 
@@ -476,6 +476,11 @@ def setup():
     signal(SIGALRM, sigalrm)
 
     load_settings()
+    if settings['media_player'] == 'omxplayer':
+        media_player = OMXMediaPlayer()
+    elif settings['media_player'] == 'vlc':
+        media_player = VLCMediaPlayer()
+
     db_conn = db.conn(settings['database'])
 
     sh.mkdir(SCREENLY_HTML, p=True)

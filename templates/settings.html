@@ -136,6 +136,10 @@
                         <div class="form-group">
                             <label class="small text-secondary">Date format</label>
                             <select class="form-control" name="date_format">
+                                <option value="dd MMM yyyy"
+                                        {% if context.date_format == 'dd MMM yyyy' %} selected="selected" {% endif %}>
+                                    day month(abrev) year
+                                </option>
                                 <option value="mm/dd/yyyy"
                                         {% if context.date_format == 'mm/dd/yyyy' %} selected="selected" {% endif %}>
                                     month/day/year

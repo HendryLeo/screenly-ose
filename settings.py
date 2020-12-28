@@ -37,7 +37,8 @@ DEFAULTS = {
         'shuffle_playlist': False,
         'verify_ssl': True,
         'usb_assets_key': '',
-        'default_assets': False
+        'default_assets': False,
+        'enable_second_screen': False
     }
 }
 CONFIGURABLE_SETTINGS = DEFAULTS['viewer'].copy()

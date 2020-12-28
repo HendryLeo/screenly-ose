@@ -4,7 +4,7 @@ import string
 import random
 from requests import get as requests_get, exceptions
 from lib.utils import is_balena_app, is_docker, is_ci, connect_to_redis
-from lib.diagnostics import get_git_branch, get_git_hash, get_git_short_hash
+from lib.diagnostics import get_git_branch, get_git_hash, get_git_short_hash, parse_cpu_info, get_raspberry_model
 from mixpanel import Mixpanel, MixpanelException
 from settings import settings
 
@@ -42,17 +42,21 @@ def fetch_remote_hash():
     Returns both the hash and if the status was updated
     or not.
     """
-
+    branch = os.getenv('GIT_BRANCH')
     get_cache = r.get('latest-remote-hash')
+
+    if not branch:
+        logging.error('Unable to get Git branch')
+        return None, False
+
     if not get_cache:
-        branch = os.getenv('GIT_BRANCH')
         resp = requests_get(
             'https://api.github.com/repos/screenly/screenly-ose/git/refs/heads/{}'.format(branch)
         )
 
         if not resp.ok:
             logging.error('Invalid response from GitHub: {}'.format(resp.content))
-            return False
+            return None, False
 
         logging.debug('Got response from GitHub: {}'.format(resp.status_code))
         latest_sha = resp.json()['object']['sha']
@@ -76,6 +80,10 @@ def is_up_to_date():
     git_short_hash = get_git_short_hash()
     get_device_id = r.get('device_id')
 
+    if not latest_sha:
+        logging.error('Unable to get latest version from GitHub')
+        return True
+
     if not get_device_id:
         device_id = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(15))
         r.set('device_id', device_id)
@@ -91,7 +99,8 @@ def is_up_to_date():
                     'Hash': str(git_short_hash),
                     'NOOBS': os.path.isfile('/boot/os_config.json'),
                     'Balena': is_balena_app(),
-                    'Docker': is_docker()
+                    'Docker': is_docker(),
+                    'Pi_Version': get_raspberry_model(parse_cpu_info()['revision'])
                 })
             except MixpanelException:
                 pass

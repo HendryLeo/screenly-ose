@@ -28,10 +28,6 @@ WOTT_PATH = '/opt/wott'
 
 arch = machine()
 
-# 300 level HTTP responses are also ok, such as redirects, which many sites have and load
-# @TODO: This should be replaced with `r.ok` instead.
-HTTP_OK = xrange(200, 399)
-
 # This will only work on the Raspberry Pi,
 # so let's wrap it in a try/except so that
 # Travis can run.
@@ -74,31 +70,52 @@ def validate_url(string):
     return bool(checker.scheme in ('http', 'https', 'rtsp', 'rtmp') and checker.netloc)
 
 
-def get_node_ip(retry=3, timeout=1):
-    """Returns the node's IP, for the interface
-    that is being used as the default gateway.
-    This should work on both MacOS X and Linux."""
-    for attempt in range(1, retry + 1):
-        try:
-            default_interface = gateways()['default'][AF_INET][1]
-            return ifaddresses(default_interface)[AF_INET][0]['addr']
-        except (KeyError, ValueError):
-            if attempt == retry:
-                break
-            time.sleep(timeout)
-    raise Exception("Unable to resolve local IP address.")
+def get_node_ip():
+    """
+    Returns the node's IP address.
+    We're using an API call to the supervisor for this on Balena
+    and an environment variable set by `install.sh` for other environments.
+    The reason for this is because we can't retrieve the host IP from within Docker.
+    """
+
+    if is_balena_app():
+        balena_supervisor_address = os.getenv('BALENA_SUPERVISOR_ADDRESS')
+        balena_supervisor_api_key = os.getenv('BALENA_SUPERVISOR_API_KEY')
+        headers = {'Content-Type': 'application/json'}
+
+        r = requests.get('{}/v1/device?apikey={}'.format(
+            balena_supervisor_address,
+            balena_supervisor_api_key
+        ), headers=headers)
+
+        if r.ok:
+            return r.json()['ip_address']
+        return 'Unknown'
+    elif os.getenv('MY_IP'):
+        return os.getenv('MY_IP')
+
+    return 'Unable to retrieve IP.'
 
 
 def get_node_mac_address():
-    """Returns the node's MAC address, for the interface
-    that is being used as the default gateway.
-    This should work on both MacOS X and Linux."""
-    try:
-        default_interface = gateways()['default'][AF_INET][1]
-        mac_address = ifaddresses(default_interface)[AF_LINK][0]['addr']
-        return mac_address
-    except (KeyError, ValueError):
-        pass
+    """
+    Returns the MAC address.
+    """
+    if is_balena_app():
+        balena_supervisor_address = os.getenv('BALENA_SUPERVISOR_ADDRESS')
+        balena_supervisor_api_key = os.getenv('BALENA_SUPERVISOR_API_KEY')
+        headers = {'Content-Type': 'application/json'}
+
+        r = requests.get('{}/v1/device?apikey={}'.format(
+            balena_supervisor_address,
+            balena_supervisor_api_key
+        ), headers=headers)
+
+        if r.ok:
+            return r.json()['mac_address']
+        return 'Unknown'
+
+    return 'Unable to retrieve MAC address.'
 
 
 def get_active_connections(bus, fields=None):
@@ -237,7 +254,7 @@ def url_fails(url):
             headers=headers,
             timeout=10,
             verify=verify
-        ).status_code in HTTP_OK:
+        ).ok:
             return False
 
         if requests.get(
@@ -246,7 +263,7 @@ def url_fails(url):
             headers=headers,
             timeout=10,
             verify=verify
-        ).status_code in HTTP_OK:
+        ).ok:
             return False
 
     except (requests.ConnectionError, requests.exceptions.Timeout):

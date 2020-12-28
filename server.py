@@ -251,6 +251,7 @@ def template(template_name, **context):
     }
     context['up_to_date'] = is_up_to_date()
     context['use_24_hour_clock'] = settings['use_24_hour_clock']
+    context['display_server_time'] = settings['display_server_time']
 
     return render_template(template_name, context=context)
 
@@ -1472,6 +1473,15 @@ class Info(Resource):
         }
 
 
+class Time(Resource):
+    method_decorators = [api_response, authorized]
+
+    def get(self):
+        return {
+            'date': int(time.mktime(datetime.now().timetuple())) * 1000
+        }
+        
+
 class AssetsControl(Resource):
     method_decorators = [api_response, authorized]
 
@@ -1601,6 +1611,7 @@ api.add_resource(Backup, '/api/v1/backup')
 api.add_resource(Recover, '/api/v1/recover')
 api.add_resource(AssetsControl, '/api/v1/assets/control/<command>')
 api.add_resource(Info, '/api/v1/info')
+api.add_resource(Time, '/api/v1/time')
 api.add_resource(ResetWifiConfig, '/api/v1/reset_wifi')
 api.add_resource(GenerateUsbAssetsKey, '/api/v1/generate_usb_assets_key')
 api.add_resource(UpgradeScreenly, '/api/v1/upgrade_screenly')

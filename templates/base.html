@@ -42,6 +42,18 @@
     $(".navbar .nav li a[href='" + window.location.pathname + "']").addClass('active');
 </script>
 
+{% if context.display_server_time %}
+<script type="text/javascript">
+    setInterval(function() {
+        $.getJSON('/api/v1/time', '', function(data) { 
+            $.each(data, function(index, element) { 
+                $('.brand').html(Date(element).toString());
+            });
+        });
+    }, 1000);
+</script>
+{% endif %}
+
 </body>
 
 </html>

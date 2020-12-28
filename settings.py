@@ -24,7 +24,8 @@ DEFAULTS = {
         'use_24_hour_clock': False,
         'use_ssl': False,
         'auth_backend': '',
-        'websocket_port': '9999'
+        'websocket_port': '9999',
+        'display_server_time': False
     },
     'viewer': {
         'audio_output': 'hdmi',
@@ -44,6 +45,7 @@ DEFAULTS = {
 }
 CONFIGURABLE_SETTINGS = DEFAULTS['viewer'].copy()
 CONFIGURABLE_SETTINGS['use_24_hour_clock'] = DEFAULTS['main']['use_24_hour_clock']
+CONFIGURABLE_SETTINGS['display_server_time'] = DEFAULTS['main']['display_server_time']
 CONFIGURABLE_SETTINGS['date_format'] = DEFAULTS['main']['date_format']
 
 PORT = int(getenv('PORT', 8080))

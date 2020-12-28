@@ -93,6 +93,20 @@
                             </div>
                         </div>
                         <div class="form-inline">
+                            <label>Display Server Time</label>
+                            <div class="ml-auto">
+                                <label id="display_server_time_checkbox"
+                                       class="is_enabled-toggle toggle switch-light switch-ios small m-0">
+                                    {% if context.display_server_time %}
+                                        <input name="display_server_time" checked="checked" type="checkbox"/>
+                                    {% else %}
+                                        <input name="display_server_time" type="checkbox"/>
+                                    {% endif %}
+                                    <span><span></span><span></span><a></a></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-inline">
                             <label>Debug logging</label>
                             <div class="ml-auto">
                                 <label id="debug_checkbox"

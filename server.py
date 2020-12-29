@@ -128,7 +128,18 @@ def append_usb_assets(mountpoint):
         'copy': False,
         'start_date': datetime_now,
         'end_date': datetime_now + timedelta(days=7),
-        'duration': settings['default_duration']
+        'duration': settings['default_duration'],
+        'start_time': '00:00',
+        'end_time': '23:59',
+        'sunday': 1,
+        'monday': 1,
+        'tuesday': 1,
+        'wednesday': 1,
+        'thursday': 1,
+        'friday': 1,
+        'saturday': 1,
+        'central_content': 0,
+        'second_screen': 0
     }
 
     for root, _, filenames in walk(mountpoint):
@@ -157,6 +168,50 @@ def append_usb_assets(mountpoint):
                     if usb_file_settings.get('duration'):
                         usb_assets_settings.update({
                             'duration': usb_file_settings.get('duration')
+                        })
+                    if usb_file_settings.get('start_time'):
+                        usb_assets_settings.update({
+                            'start_time': usb_file_settings.get('start_time')
+                        })
+                    if usb_file_settings.get('end_time'):
+                        usb_assets_settings.update({
+                            'end_time': usb_file_settings.get('end_time')
+                        })
+                    if usb_file_settings.get('sunday'):
+                        usb_assets_settings.update({
+                            'sunday': usb_file_settings.get('sunday')
+                        })
+                    if usb_file_settings.get('monday'):
+                        usb_assets_settings.update({
+                            'monday': usb_file_settings.get('monday')
+                        })
+                    if usb_file_settings.get('tuesday'):
+                        usb_assets_settings.update({
+                            'tuesday': usb_file_settings.get('tuesday')
+                        })
+                    if usb_file_settings.get('wednesday'):
+                        usb_assets_settings.update({
+                            'wednesday': usb_file_settings.get('wednesday')
+                        })
+                    if usb_file_settings.get('thursday'):
+                        usb_assets_settings.update({
+                            'thursday': usb_file_settings.get('thursday')
+                        })
+                    if usb_file_settings.get('friday'):
+                        usb_assets_settings.update({
+                            'friday': usb_file_settings.get('friday')
+                        })
+                    if usb_file_settings.get('saturday'):
+                        usb_assets_settings.update({
+                            'saturday': usb_file_settings.get('saturday')
+                        })
+                    if usb_file_settings.get('central_content'):
+                        usb_assets_settings.update({
+                            'central_content': usb_file_settings.get('central_content')
+                        })
+                    if usb_file_settings.get('second_screen'):
+                        usb_assets_settings.update({
+                            'second_screen': usb_file_settings.get('second_screen')
                         })
 
                     files = ['%s/%s' % (root, y) for root, _, filenames in walk(mountpoint) for y in filenames]
@@ -274,6 +329,21 @@ class AssetModel(Schema):
             'type': 'string',
             'format': 'date-time'
         },
+        'start_time': {
+            'type': 'string',
+            'format': 'time'
+        },
+        'end_time': {
+            'type': 'string',
+            'format': 'time'
+        },
+        'sunday': {'type': 'integer', 'format': 'int64'},
+        'monday': {'type': 'integer', 'format': 'int64'},
+        'tuesday': {'type': 'integer', 'format': 'int64'},
+        'wednesday': {'type': 'integer', 'format': 'int64'},
+        'thursday': {'type': 'integer', 'format': 'int64'},
+        'friday': {'type': 'integer', 'format': 'int64'},
+        'saturday': {'type': 'integer', 'format': 'int64'},
         'duration': {'type': 'string'},
         'mimetype': {'type': 'string'},
         'is_active': {
@@ -299,6 +369,14 @@ class AssetModel(Schema):
         'skip_asset_check': {
             'type': 'integer',
             'format': 'int64',
+        },
+        'central_content': {
+            'type': 'integer',
+            'format': 'int64',
+        },
+        'second_screen': {
+            'type': 'integer',
+            'format': 'int64',
         }
     }
 
@@ -316,6 +394,21 @@ class AssetRequestModel(Schema):
             'type': 'string',
             'format': 'date-time'
         },
+        'start_time': {
+            'type': 'string',
+            'format': 'time'
+        },
+        'end_time': {
+            'type': 'string',
+            'format': 'time'
+        },
+        'sunday': {'type': 'integer', 'format': 'int64'},
+        'monday': {'type': 'integer', 'format': 'int64'},
+        'tuesday': {'type': 'integer', 'format': 'int64'},
+        'wednesday': {'type': 'integer', 'format': 'int64'},
+        'thursday': {'type': 'integer', 'format': 'int64'},
+        'friday': {'type': 'integer', 'format': 'int64'},
+        'saturday': {'type': 'integer', 'format': 'int64'},
         'duration': {'type': 'string'},
         'mimetype': {'type': 'string'},
         'is_enabled': {
@@ -331,6 +424,14 @@ class AssetRequestModel(Schema):
             'format': 'int64',
         },
         'skip_asset_check': {
+            'type': 'integer',
+            'format': 'int64',
+        },
+        'central_content': {
+            'type': 'integer',
+            'format': 'int64',
+        },
+        'second_screen': {
             'type': 'integer',
             'format': 'int64',
         }
@@ -365,6 +466,21 @@ class AssetPropertiesModel(Schema):
             'type': 'string',
             'format': 'date-time'
         },
+        'start_time': {
+            'type': 'string',
+            'format': 'time'
+        },
+        'end_time': {
+            'type': 'string',
+            'format': 'time'
+        },
+        'sunday': {'type': 'integer', 'format': 'int64'},
+        'monday': {'type': 'integer', 'format': 'int64'},
+        'tuesday': {'type': 'integer', 'format': 'int64'},
+        'wednesday': {'type': 'integer', 'format': 'int64'},
+        'thursday': {'type': 'integer', 'format': 'int64'},
+        'friday': {'type': 'integer', 'format': 'int64'},
+        'saturday': {'type': 'integer', 'format': 'int64'},
         'duration': {'type': 'string'},
         'is_active': {
             'type': 'integer',
@@ -383,6 +499,14 @@ class AssetPropertiesModel(Schema):
             'format': 'int64',
         },
         'skip_asset_check': {
+            'type': 'integer',
+            'format': 'int64',
+        },
+        'central_content': {
+            'type': 'integer',
+            'format': 'int64',
+        },
+        'second_screen': {
             'type': 'integer',
             'format': 'int64',
         }
@@ -435,6 +559,13 @@ def prepare_asset(request, unique_name=False):
         'name': name,
         'mimetype': get('mimetype'),
         'asset_id': get('asset_id'),
+        'sunday': get('sunday'),
+        'monday': get('monday'),
+        'tuesday': get('tuesday'),
+        'wednesday': get('wednesday'),
+        'thursday': get('thursday'),
+        'friday': get('friday'),
+        'saturday': get('saturday'),
         'is_enabled': get('is_enabled'),
         'is_processing': get('is_processing'),
         'nocache': get('nocache'),
@@ -482,6 +613,16 @@ def prepare_asset(request, unique_name=False):
     else:
         asset['end_date'] = ""
 
+    if get('start_time'):
+        asset['start_time'] = get('start_time')
+    else:
+        asset['start_time'] = ""
+
+    if get('end_time'):
+        asset['end_time'] = get('end_time')
+    else:
+        asset['end_time'] = ""
+
     return asset
 
 
@@ -523,6 +664,13 @@ def prepare_asset_v1_2(request_environ, asset_id=None, unique_name=False):
     asset = {
         'name': name,
         'mimetype': get('mimetype'),
+        'sunday': get('sunday'),
+        'monday': get('monday'),
+        'tuesday': get('tuesday'),
+        'wednesday': get('wednesday'),
+        'thursday': get('thursday'),
+        'friday': get('friday'),
+        'saturday': get('saturday'),
         'is_enabled': get('is_enabled'),
         'nocache': get('nocache')
     }
@@ -566,6 +714,9 @@ def prepare_asset_v1_2(request_environ, asset_id=None, unique_name=False):
     asset['start_date'] = date_parser.parse(get('start_date')).replace(tzinfo=None)
     asset['end_date'] = date_parser.parse(get('end_date')).replace(tzinfo=None)
 
+    asset['start_time'] = get('start_time')
+    asset['end_time'] = get('end_time')
+
     return asset
 
 
@@ -602,6 +753,17 @@ def prepare_usb_asset(filepath, **kwargs):
         'skip_asset_check': 0,
         'start_date': kwargs['start_date'],
         'uri': filepath,
+        'start_time': kwargs['start_time'],
+        'end_time': kwargs['end_time'],
+        'sunday': kwargs['sunday'],
+        'monday': kwargs['monday'],
+        'tuesday': kwargs['tuesday'],
+        'wednesday': kwargs['wednesday'],
+        'thursday': kwargs['thursday'],
+        'friday': kwargs['friday'],
+        'saturday': kwargs['saturday'],
+        'central_content': kwargs['central_content'],
+        'second_screen': kwargs['second_screen']
     }
 
 
@@ -615,7 +777,6 @@ def prepare_default_asset(**kwargs):
     return {
         'asset_id': asset_id,
         'duration': duration,
-        'end_date': kwargs['end_date'],
         'is_active': 1,
         'is_enabled': True,
         'is_processing': 0,
@@ -625,6 +786,16 @@ def prepare_default_asset(**kwargs):
         'play_order': 0,
         'skip_asset_check': 0,
         'start_date': kwargs['start_date'],
+        'end_date': kwargs['end_date'],
+        'start_time': kwargs['start_time'],
+        'end_time': kwargs['end_time'],
+        'sunday': 1,
+        'monday': 1,
+        'tuesday': 1,
+        'wednesday': 1,
+        'thursday': 1,
+        'friday': 1,
+        'saturday': 1,
         'uri': kwargs['uri']
     }
 
@@ -636,6 +807,8 @@ def add_default_assets():
     default_asset_settings = {
         'start_date': datetime_now,
         'end_date': datetime_now.replace(year=datetime_now.year + 6),
+        'start_time': '00:00',
+        'end_time': '23:59',
         'duration': settings['default_duration']
     }
 
@@ -672,7 +845,7 @@ def update_asset(asset, data):
         if key in ['start_date', 'end_date']:
             value = date_parser.parse(value).replace(tzinfo=None)
 
-        if key in ['play_order', 'skip_asset_check', 'is_enabled', 'is_active', 'nocache']:
+        if key in ['play_order', 'skip_asset_check', 'is_enabled', 'is_active', 'nocache', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']:
             value = int(value)
 
         if key == 'duration':

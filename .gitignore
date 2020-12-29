@@ -38,3 +38,7 @@ node_modules
 *.retry
 
 .env
+static/js/screenly-ose.js.map
+static/js/settings.js.map
+static/css/screenly.css.map
+.vscode/settings.json

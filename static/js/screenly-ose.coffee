@@ -18,7 +18,10 @@ else
   dateSettings.showMeridian = true
 
 dateSettings.date = dateFormat.toUpperCase()
-dateSettings.datepickerFormat = dateFormat
+if dateFormat == 'dd MMM yyyy'
+  dateSettings.datepickerFormat = 'dd M yyyy' # jqueryUI datepicker format is a bit different
+else
+  dateSettings.datepickerFormat = dateFormat
 
 dateSettings.fullDate = "#{dateSettings.date} #{dateSettings.fullTime}"
 
@@ -81,7 +84,7 @@ Backbone.emulateJSON = off
 # Models
 API.Asset = class Asset extends Backbone.Model
   idAttribute: "asset_id"
-  fields: 'name mimetype uri start_date end_date duration skip_asset_check'.split ' '
+  fields: 'name mimetype uri start_date end_date start_time end_time sunday monday tuesday wednesday thursday friday saturday duration skip_asset_check central_content second_screen'.split ' '
   defaults: ->
     name: ''
     mimetype: 'webpage'
@@ -89,18 +92,26 @@ API.Asset = class Asset extends Backbone.Model
     is_active: 1
     start_date: ''
     end_date: ''
+    start_time: ''
+    end_time: ''
+    sunday: 1
+    monday: 1
+    tuesday: 1
+    wednesday: 1
+    thursday: 1
+    friday: 1
+    saturday: 1
     duration: defaultDuration
     is_enabled: 0
     is_processing: 0
     nocache: 0
     play_order: 0
-    skip_asset_check: 0
+    skip_asset_check: 0,
+    central_content: 0,
+    second_screen: 0
   active: =>
-    if @get('is_enabled') and @get('start_date') and @get('end_date')
-      at = now()
-      start_date = new Date(@get('start_date'));
-      end_date = new Date(@get('end_date'));
-      return start_date <= at <= end_date
+    if @get('is_active') == 1
+      return true
     else
       return false
 
@@ -139,6 +150,17 @@ API.View.AddAssetView = class AddAssetView extends Backbone.View
       d = date_to deadline
       @.$fv "#{tag}_date_date", d.date()
       @.$fv "#{tag}_date_time", d.time()
+    @.$fv "start_time", "00:00"
+    @.$fv "end_time", "23:59"
+    @.$fv "sunday", 1
+    @.$fv "monday", 1
+    @.$fv "tuesday", 1
+    @.$fv "wednesday", 1
+    @.$fv "thursday", 1
+    @.$fv "friday", 1
+    @.$fv "saturday", 1
+    @.$fv "central_content", 0
+    @.$fv "second_screen", 0
 
     no
 
@@ -303,6 +325,15 @@ API.View.EditAssetView = class EditAssetView extends Backbone.View
       minuteStep: 5, showInputs: yes, disableFocus: yes, showMeridian: dateSettings.showMeridian
 
     (@$ 'input[name="nocache"]').prop 'checked', @model.get 'nocache'
+    (@$ 'input[name="sunday"]').prop 'checked', @model.get 'sunday'
+    (@$ 'input[name="monday"]').prop 'checked', @model.get 'monday'
+    (@$ 'input[name="tuesday"]').prop 'checked', @model.get 'tuesday'
+    (@$ 'input[name="wednesday"]').prop 'checked', @model.get 'wednesday'
+    (@$ 'input[name="thursday"]').prop 'checked', @model.get 'thursday'
+    (@$ 'input[name="friday"]').prop 'checked', @model.get 'friday'
+    (@$ 'input[name="saturday"]').prop 'checked', @model.get 'saturday'
+    (@$ 'input[name="central_content"]').prop 'checked', @model.get 'central_content'
+    (@$ 'input[name="second_screen"]').prop 'checked', @model.get 'second_screen'
     (@$ '.modal-header .close').remove()
     (@$el.children ":first").modal()
 
@@ -324,7 +355,7 @@ API.View.EditAssetView = class EditAssetView extends Backbone.View
 
     if (@model.get 'mimetype') == 'video'
       (@$f 'duration').prop 'disabled', on
-
+    (@$f 'central_content').prop 'disabled', on
     for field in @model.fields
       if (@$fv field) != @model.get field
         @$fv field, @model.get field
@@ -336,6 +367,7 @@ API.View.EditAssetView = class EditAssetView extends Backbone.View
       (@$f "#{which}_date_date").datepicker autoclose: yes, format: dateSettings.datepickerFormat
       (@$f "#{which}_date_date").datepicker 'setValue', d.date()
       @$fv "#{which}_date_time", d.time()
+      @$fv "#{which}_time", @model.get "#{which}_time"
 
     @displayAdvanced()
     @delegateEvents()
@@ -382,6 +414,15 @@ API.View.EditAssetView = class EditAssetView extends Backbone.View
     @viewmodel()
     save = null
     @model.set 'nocache', if (@$ 'input[name="nocache"]').prop 'checked' then 1 else 0
+    @model.set 'sunday', if (@$ 'input[name="sunday"]').prop 'checked' then 1 else 0
+    @model.set 'monday', if (@$ 'input[name="monday"]').prop 'checked' then 1 else 0
+    @model.set 'tuesday', if (@$ 'input[name="tuesday"]').prop 'checked' then 1 else 0
+    @model.set 'wednesday', if (@$ 'input[name="wednesday"]').prop 'checked' then 1 else 0
+    @model.set 'thursday', if (@$ 'input[name="thursday"]').prop 'checked' then 1 else 0
+    @model.set 'friday', if (@$ 'input[name="friday"]').prop 'checked' then 1 else 0
+    @model.set 'saturday', if (@$ 'input[name="saturday"]').prop 'checked' then 1 else 0
+    @model.set 'central_content', if (@$ 'input[name="central_content"]').prop 'checked' then 1 else 0
+    @model.set 'second_screen', if (@$ 'input[name="second_screen"]').prop 'checked' then 1 else 0
 
     if not @model.get 'name'
       if @model.old_name()
@@ -427,6 +468,12 @@ API.View.EditAssetView = class EditAssetView extends Backbone.View
             return
 
           'End date should be after start date.'
+      end_time: (v) =>
+        s_time = (@$fv 'start_time').split(':')
+        e_time = (@$fv 'end_time').split(':')
+        unless (new Date(1970,0,1,s_time[0],s_time[1],0,0)) < (new Date(1970,0,1,e_time[0],e_time[1],59,0))
+          'End time should be after start time.'
+        
     errors = ([field, v] for field, fn of validators when v = fn (@$fv field))
 
     (@$ ".form-group .help-inline.invalid-feedback").remove()
@@ -480,12 +527,49 @@ API.View.AssetRowView = class AssetRowView extends Backbone.View
     @template = get_template 'asset-row'
 
   render: =>
+    yesNo = (p1) ->
+      if (!!p1)
+        '&#10004;'
+      else
+        '&#10008;';
+    centralYesNo = (p1) ->
+      if (!!p1)
+        '<i class="fas fa-sync"></i>'
+      else
+        '';
+
     @$el.html @template _.extend json = @model.toJSON(),
       name: insertWbr truncate_str json.name # word break urls at slashes
       duration: durationSecondsToHumanReadable(json.duration)
       start_date: (date_to json.start_date).string()
       end_date: (date_to json.end_date).string()
+      start_time: json.start_time
+      end_time: json.end_time
+      sunday_mark: yesNo(json.sunday)
+      monday_mark: yesNo(json.monday)
+      tuesday_mark: yesNo(json.tuesday)
+      wednesday_mark: yesNo(json.wednesday)
+      thursday_mark: yesNo(json.thursday)
+      friday_mark: yesNo(json.friday)
+      saturday_mark: yesNo(json.saturday)
+      central_content_mark: centralYesNo(json.central_content)
     @$el.prop 'id', @model.get 'asset_id'
+    if not @model.get('is_active') and @model.get('is_enabled')
+      @$el.prop 'style', 'color:red'
+    if @model.get('sunday') == 0
+      (@$('.sunday')).prop 'style', 'color: gray'
+    if @model.get('monday') == 0
+      (@$('.monday')).prop 'style', 'color: gray'
+    if @model.get('tuesday') == 0
+      (@$('.tuesday')).prop 'style', 'color: gray'
+    if @model.get('wednesday') == 0
+      (@$('.wednesday')).prop 'style', 'color: gray'
+    if @model.get('thursday') == 0
+      (@$('.thursday')).prop 'style', 'color: gray'
+    if @model.get('friday') == 0
+      (@$('.friday')).prop 'style', 'color: gray'
+    if @model.get('saturday') == 0
+      (@$('.saturday')).prop 'style', 'color: gray'
     (@$ ".delete-asset-button").popover content: get_template 'confirm-delete'
     (@$ ".toggle input").prop "checked", @model.get 'is_enabled'
     (@$ ".asset-icon").addClass switch @model.get "mimetype"

@@ -32,7 +32,11 @@
 
   dateSettings.date = dateFormat.toUpperCase();
 
-  dateSettings.datepickerFormat = dateFormat;
+  if (dateFormat === 'dd MMM yyyy') {
+    dateSettings.datepickerFormat = 'dd M yyyy';
+  } else {
+    dateSettings.datepickerFormat = dateFormat;
+  }
 
   dateSettings.fullDate = dateSettings.date + " " + dateSettings.fullTime;
 
@@ -140,7 +144,7 @@
 
     Asset.prototype.idAttribute = "asset_id";
 
-    Asset.prototype.fields = 'name mimetype uri start_date end_date duration skip_asset_check'.split(' ');
+    Asset.prototype.fields = 'name mimetype uri start_date end_date start_time end_time sunday monday tuesday wednesday thursday friday saturday duration skip_asset_check central_content second_screen'.split(' ');
 
     Asset.prototype.defaults = function() {
       return {
@@ -150,22 +154,29 @@
         is_active: 1,
         start_date: '',
         end_date: '',
+        start_time: '',
+        end_time: '',
+        sunday: 1,
+        monday: 1,
+        tuesday: 1,
+        wednesday: 1,
+        thursday: 1,
+        friday: 1,
+        saturday: 1,
         duration: defaultDuration,
         is_enabled: 0,
         is_processing: 0,
         nocache: 0,
         play_order: 0,
-        skip_asset_check: 0
+        skip_asset_check: 0,
+        central_content: 0,
+        second_screen: 0
       };
     };
 
     Asset.prototype.active = function() {
-      var at, end_date, start_date;
-      if (this.get('is_enabled') && this.get('start_date') && this.get('end_date')) {
-        at = now();
-        start_date = new Date(this.get('start_date'));
-        end_date = new Date(this.get('end_date'));
-        return (start_date <= at && at <= end_date);
+      if (this.get('is_active') === 1) {
+        return true;
       } else {
         return false;
       }
@@ -260,6 +271,17 @@
         this.$fv(tag + "_date_date", d.date());
         this.$fv(tag + "_date_time", d.time());
       }
+      this.$fv("start_time", "00:00");
+      this.$fv("end_time", "23:59");
+      this.$fv("sunday", 1);
+      this.$fv("monday", 1);
+      this.$fv("tuesday", 1);
+      this.$fv("wednesday", 1);
+      this.$fv("thursday", 1);
+      this.$fv("friday", 1);
+      this.$fv("saturday", 1);
+      this.$fv("central_content", 0);
+      this.$fv("second_screen", 0);
       return false;
     };
 
@@ -544,6 +566,15 @@
         showMeridian: dateSettings.showMeridian
       });
       (this.$('input[name="nocache"]')).prop('checked', this.model.get('nocache'));
+      (this.$('input[name="sunday"]')).prop('checked', this.model.get('sunday'));
+      (this.$('input[name="monday"]')).prop('checked', this.model.get('monday'));
+      (this.$('input[name="tuesday"]')).prop('checked', this.model.get('tuesday'));
+      (this.$('input[name="wednesday"]')).prop('checked', this.model.get('wednesday'));
+      (this.$('input[name="thursday"]')).prop('checked', this.model.get('thursday'));
+      (this.$('input[name="friday"]')).prop('checked', this.model.get('friday'));
+      (this.$('input[name="saturday"]')).prop('checked', this.model.get('saturday'));
+      (this.$('input[name="central_content"]')).prop('checked', this.model.get('central_content'));
+      (this.$('input[name="second_screen"]')).prop('checked', this.model.get('second_screen'));
       (this.$('.modal-header .close')).remove();
       (this.$el.children(":first")).modal();
       this.model.backup();
@@ -570,6 +601,7 @@
       if ((this.model.get('mimetype')) === 'video') {
         (this.$f('duration')).prop('disabled', true);
       }
+      (this.$f('central_content')).prop('disabled', true);
       ref1 = this.model.fields;
       for (l = 0, len1 = ref1.length; l < len1; l++) {
         field = ref1[l];
@@ -589,6 +621,7 @@
         });
         (this.$f(which + "_date_date")).datepicker('setValue', d.date());
         this.$fv(which + "_date_time", d.time());
+        this.$fv(which + "_time", this.model.get(which + "_time"));
       }
       this.displayAdvanced();
       this.delegateEvents();
@@ -659,6 +692,15 @@
       this.viewmodel();
       save = null;
       this.model.set('nocache', (this.$('input[name="nocache"]')).prop('checked') ? 1 : 0);
+      this.model.set('sunday', (this.$('input[name="sunday"]')).prop('checked') ? 1 : 0);
+      this.model.set('monday', (this.$('input[name="monday"]')).prop('checked') ? 1 : 0);
+      this.model.set('tuesday', (this.$('input[name="tuesday"]')).prop('checked') ? 1 : 0);
+      this.model.set('wednesday', (this.$('input[name="wednesday"]')).prop('checked') ? 1 : 0);
+      this.model.set('thursday', (this.$('input[name="thursday"]')).prop('checked') ? 1 : 0);
+      this.model.set('friday', (this.$('input[name="friday"]')).prop('checked') ? 1 : 0);
+      this.model.set('saturday', (this.$('input[name="saturday"]')).prop('checked') ? 1 : 0);
+      this.model.set('central_content', (this.$('input[name="central_content"]')).prop('checked') ? 1 : 0);
+      this.model.set('second_screen', (this.$('input[name="second_screen"]')).prop('checked') ? 1 : 0);
       if (!this.model.get('name')) {
         if (this.model.old_name()) {
           this.model.set({
@@ -736,6 +778,16 @@
                 return;
               }
               return 'End date should be after start date.';
+            }
+          };
+        })(this),
+        end_time: (function(_this) {
+          return function(v) {
+            var e_time, s_time;
+            s_time = (_this.$fv('start_time')).split(':');
+            e_time = (_this.$fv('end_time')).split(':');
+            if (!((new Date(1970, 0, 1, s_time[0], s_time[1], 0, 0)) < (new Date(1970, 0, 1, e_time[0], e_time[1], 59, 0)))) {
+              return 'End time should be after start time.';
             }
           };
         })(this)
@@ -842,14 +894,62 @@
     };
 
     AssetRowView.prototype.render = function() {
-      var json;
+      var centralYesNo, json, yesNo;
+      yesNo = function(p1) {
+        if (!!p1) {
+          return '&#10004;';
+        } else {
+          return '&#10008;';
+        }
+      };
+      centralYesNo = function(p1) {
+        if (!!p1) {
+          return '<i class="fas fa-sync"></i>';
+        } else {
+          return '';
+        }
+      };
       this.$el.html(this.template(_.extend(json = this.model.toJSON(), {
         name: insertWbr(truncate_str(json.name)),
         duration: durationSecondsToHumanReadable(json.duration),
         start_date: (date_to(json.start_date)).string(),
-        end_date: (date_to(json.end_date)).string()
+        end_date: (date_to(json.end_date)).string(),
+        start_time: json.start_time,
+        end_time: json.end_time,
+        sunday_mark: yesNo(json.sunday),
+        monday_mark: yesNo(json.monday),
+        tuesday_mark: yesNo(json.tuesday),
+        wednesday_mark: yesNo(json.wednesday),
+        thursday_mark: yesNo(json.thursday),
+        friday_mark: yesNo(json.friday),
+        saturday_mark: yesNo(json.saturday),
+        central_content_mark: centralYesNo(json.central_content)
       })));
       this.$el.prop('id', this.model.get('asset_id'));
+      if (!this.model.get('is_active') && this.model.get('is_enabled')) {
+        this.$el.prop('style', 'color:red');
+      }
+      if (this.model.get('sunday') === 0) {
+        (this.$('.sunday')).prop('style', 'color: gray');
+      }
+      if (this.model.get('monday') === 0) {
+        (this.$('.monday')).prop('style', 'color: gray');
+      }
+      if (this.model.get('tuesday') === 0) {
+        (this.$('.tuesday')).prop('style', 'color: gray');
+      }
+      if (this.model.get('wednesday') === 0) {
+        (this.$('.wednesday')).prop('style', 'color: gray');
+      }
+      if (this.model.get('thursday') === 0) {
+        (this.$('.thursday')).prop('style', 'color: gray');
+      }
+      if (this.model.get('friday') === 0) {
+        (this.$('.friday')).prop('style', 'color: gray');
+      }
+      if (this.model.get('saturday') === 0) {
+        (this.$('.saturday')).prop('style', 'color: gray');
+      }
       (this.$(".delete-asset-button")).popover({
         content: get_template('confirm-delete')
       });

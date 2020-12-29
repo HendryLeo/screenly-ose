@@ -3,10 +3,10 @@ import queries
 import datetime
 
 FIELDS = ["asset_id", "name", "uri", "start_date",
-          "end_date", "duration", "mimetype", "is_enabled", "is_processing", "nocache", "play_order",
-          "skip_asset_check"]
+          "end_date", "start_time", "end_time", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "duration", "mimetype", "is_enabled", "is_processing", "nocache", "play_order",
+          "skip_asset_check", "central_content", "second_screen"]
 
-create_assets_table = 'CREATE TABLE assets(asset_id text primary key, name text, uri text, md5 text, start_date timestamp, end_date timestamp, duration text, mimetype text, is_enabled integer default 0, is_processing integer default 0, nocache integer default 0, play_order integer default 0, skip_asset_check integer default 0)'
+create_assets_table = 'CREATE TABLE assets(asset_id text primary key, name text, uri text, md5 text, start_date timestamp, end_date timestamp, start_time time, end_time time, sunday integer default 1, monday integer default 1, tuesday integer default 1, wednesday integer default 1, thursday integer default 1, friday integer default 1, saturday integer default 1, duration text, mimetype text, is_enabled integer default 0, is_processing integer default 0, nocache integer default 0, play_order integer default 0, skip_asset_check integer default 0, central_content int default 0, second_screen int default 0)'
 
 
 # Note all times are naive for legacy reasons but always UTC.
@@ -29,9 +29,17 @@ def is_active(asset, at_time=None):
 
     """
 
-    if asset['is_enabled'] and asset['start_date'] and asset['end_date']:
+    if asset['is_enabled'] and asset['start_date'] and asset['end_date'] and asset['start_time'] and asset['end_time']:
         at = at_time or get_time()
-        return 1 if asset['start_date'] < at < asset['end_date'] else 0
+        # return 1 if asset['start_date'].time() < at.time() < asset['end_date'].time() else 0
+        at_local = datetime.datetime.now()
+        weekday = at.weekday() #Monday = 0, Sunday = 6
+        validdays = [asset['monday'], asset['tuesday'], asset['wednesday'], asset['thursday'], asset['friday'], asset['saturday'], asset['sunday']]
+        start_time = datetime.datetime.strptime(asset['start_time'], '%H:%M')
+        end_time = datetime.datetime.strptime(asset['end_time'], '%H:%M')
+        if (asset['start_date'] < at < asset['end_date']) and (start_time.time() < at_local.time() < end_time.time()) and validdays[weekday] == 1:
+            return 1
+            
     return 0
 
 

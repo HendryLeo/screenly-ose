@@ -129,7 +129,18 @@
       text += "  copy: " + (Boolean($("input[name=\"copy_assets\"]").prop("checked"))) + "\r\n";
       text += "  start_date: \"" + (start_date_usb_file.val()) + "\"\r\n";
       text += "  end_date: \"" + (end_date_usb_file.val()) + "\"\r\n";
-      text += "  duration: " + ($("input[name=\"duration\"]").val());
+      text += "  duration: " + ($("input[name=\"duration\"]").val()) + "\r\n";
+      text += "  start_time: \"00:00\"\r\n";
+      text += "  end_time: \"23:59\"\r\n";
+      text += "  sunday: 1\r\n";
+      text += "  monday: 1\r\n";
+      text += "  tuesday: 1\r\n";
+      text += "  wednesday: 1\r\n";
+      text += "  thursday: 1\r\n";
+      text += "  friday: 1\r\n";
+      text += "  saturday: 1\r\n";
+      text += "  central_content: 0\r\n";
+      text += "  second_screen: 0";
       blob = new Blob([text], {
         type: 'text/csv'
       });

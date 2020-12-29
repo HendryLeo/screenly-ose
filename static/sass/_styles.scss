@@ -385,6 +385,7 @@ input[name="file_upload"] {
 
 .modal-body {
   max-height: 600px !important;
+  overflow-y: scroll;
 }
 
 .ui-sortable-helper {
@@ -401,8 +402,8 @@ input[name="file_upload"] {
 
 .asset_row_name {
   @include ellip();
-  max-width: 290px;
-  min-width: 290px;
+  max-width: 190px;
+  min-width: 190px;
   img {
     cursor: move;
   }

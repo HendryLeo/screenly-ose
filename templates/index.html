@@ -38,14 +38,38 @@
             <i class="asset-icon"></i>
             <%= name %>
         </td>
-        <td style="width:21%">
+        <td style="width:11%">
             <%= start_date %>
         </td>
-        <td style="width:21%">
+        <td style="width:11%">
             <%= end_date %>
         </td>
-        <td style="width:13%">
+        <td style="width:5%">
             <%= duration %>
+        </td>
+        <td style="width:10%">
+            <%= start_time %> - <%= end_time %>
+        </td>
+        <td class="sunday" style="width:2%">
+            <%= sunday_mark %>
+        </td>
+        <td class="monday" style="width:2%">
+            <%= monday_mark %>
+        </td>
+        <td class="tuesday" style="width:2%">
+            <%= tuesday_mark %>
+        </td>
+        <td class="wednesday" style="width:2%">
+            <%= wednesday_mark %>
+        </td>
+        <td class="thursday" style="width:2%">
+            <%= thursday_mark %>
+        </td>
+        <td class="friday" style="width:2%">
+            <%= friday_mark %>
+        </td>
+        <td class="saturday" style="width:2%">
+            <%= saturday_mark %>
         </td>
         <td class="asset-toggle" style="width:7%">
             <label class="is_enabled-toggle toggle switch-light switch-ios small m-0">
@@ -220,6 +244,30 @@
                                             </div>
                                             <input name="end_date" type="hidden"/>
                                         </div>
+                                        <div class="form-group row start_time">
+                                            <label class="col-4 col-form-label">Start Time</label>
+                                            <div class="controls col-7">
+                                                <input class="form-control time" name="start_time" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row end_time">
+                                            <label class="col-4 col-form-label">End Time</label>
+                                            <div class="controls col-7">
+                                                <input class="form-control time" name="end_time" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-4 col-form-label">Days</label>
+                                            <div class="controls form-inline col-7">
+                                                <label for="sunday" style="margin-right: 5px">Sunday</label><input class="form-control" style="margin-right: 15px" name="sunday" type="checkbox"/>
+                                                <label for="monday" style="margin-right: 5px">Monday</label><input class="form-control" style="margin-right: 15px" name="monday" type="checkbox"/>
+                                                <label for="tuesday" style="margin-right: 5px">Tuesday</label><input class="form-control" style="margin-right: 15px" name="tuesday" type="checkbox"/>
+                                                <label for="wednesday" style="margin-right: 5px">Wednesday</label><input class="form-control" style="margin-right: 15px" name="wednesday" type="checkbox"/>
+                                                <label for="thursday" style="margin-right: 5px">Thursday</label><input class="form-control" style="margin-right: 15px" name="thursday" type="checkbox"/>
+                                                <label for="friday" style="margin-right: 5px">Friday</label><input class="form-control" style="margin-right: 15px" name="friday" type="checkbox"/>
+                                                <label for="saturday" style="margin-right: 5px">Saturday</label><input class="form-control" style="margin-right: 15px" name="saturday" type="checkbox"/>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group row duration">
                                         <label class="col-4 col-form-label">Duration</label>
@@ -227,6 +275,12 @@
                                             <input class="form-control" name="duration" type="number"/>
                                             seconds
                                             &nbsp;
+                                        </div>
+                                    </div>
+                                    <div class="form-group row central_content">
+                                        <label class="col-4 col-form-label">Central Content</label>
+                                        <div class="col-7 controls">
+                                            <input class="form-control" style="width: 15%" name="central_content" type="checkbox"/>
                                         </div>
                                     </div>
                                     <div class="advanced-accordion accordion">
@@ -334,10 +388,18 @@
                         <thead class="table-borderless">
                         <tr>
                             <th class="text-secondary font-weight-normal asset_row_name">Name</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">Start</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">End</th>
-                            <th class="text-secondary font-weight-normal" style="width:13%">Duration</th>
-                            <th class="text-secondary font-weight-normal" style="width:7%">Activity</th>
+                            <th class="text-secondary font-weight-normal" style="width:11%">Schedule Start</th>
+                            <th class="text-secondary font-weight-normal" style="width:11%">Schedule End</th>
+                            <th class="text-secondary font-weight-normal" style="width:5%">Duration</th>
+                            <th class="text-secondary font-weight-normal" style="width:10%">Between</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Sun</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Mon</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Tue</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Wed</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Thu</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Fri</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Sat</th>
+                            <th class="text-secondary font-weight-normal" style="width:7%">Enabled</th>
                             <th class="text-secondary font-weight-normal" style="width:13%"></th>
                         </tr>
                         </thead>
@@ -355,10 +417,18 @@
                         <thead class="table-borderless">
                         <tr>
                             <th class="text-secondary font-weight-normal asset_row_name">Name</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">Start</th>
-                            <th class="text-secondary font-weight-normal" style="width:21%">End</th>
-                            <th class="text-secondary font-weight-normal" style="width:13%">Duration</th>
-                            <th class="text-secondary font-weight-normal" style="width:7%">Activity</th>
+                            <th class="text-secondary font-weight-normal" style="width:11%">Schedule Start</th>
+                            <th class="text-secondary font-weight-normal" style="width:11%">Schedule End</th>
+                            <th class="text-secondary font-weight-normal" style="width:5%">Duration</th>
+                            <th class="text-secondary font-weight-normal" style="width:10%">Between</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Sun</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Mon</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Tue</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Wed</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Thu</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Fri</th>
+                            <th class="text-secondary font-weight-normal" style="width:2%">Sat</th>
+                            <th class="text-secondary font-weight-normal" style="width:7%">Enabled</th>
                             <th class="text-secondary font-weight-normal" style="width:13%"></th>
                         </tr>
                         </thead>

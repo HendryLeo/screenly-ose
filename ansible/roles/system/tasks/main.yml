@@ -150,6 +150,7 @@
       - libssl-dev
       - matchbox
       - omxplayer
+      - vlc
       - python-dev
       - python-gobject
       - python-netifaces

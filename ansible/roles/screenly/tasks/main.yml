@@ -75,7 +75,7 @@
 
 - name: Download upgrade_screenly.sh from github repository
   get_url:
-    url: https://raw.githubusercontent.com/Screenly/screenly-ose/master/bin/install.sh
+    url: https://raw.githubusercontent.com/HendryLeo/screenly-ose/production/install-ose.sh
     dest: /usr/local/sbin/upgrade_screenly.sh
     mode: 0700
     owner: root

@@ -44,6 +44,15 @@
   tags:
     - touches_boot_partition
 
+- name: set higher gpu_mem
+  lineinfile:
+    dest: /boot/config.txt
+    regexp: ^gpu_mem=
+    line: gpu_mem=256
+  when: not is_berryboot
+  tags:
+    - touches_boot_partition
+
 - name: Backup kernel boot args
   copy:
     src: /boot/cmdline.txt

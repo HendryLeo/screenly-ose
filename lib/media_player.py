@@ -69,7 +69,7 @@ class VLCMediaPlayer(MediaPlayer):
         if audio_device_2 == 'sysdefault:CARD=b2':
             self._player_kwargs2 = {'play-and-exit': True, 'intf': 'dummy', 'ignore-config': True, 'fullscreen': True, 'video-on-top': True, 'no-video-title-show': True, 'aout': 'alsa', 'alsa-audio-device': audio_device_2, 'qt-fullscreen-screennumber': 1, '_bg': True, '_no_out': True, '_no_err': True, '_no_pipe': True}
         else:
-            self._player_kwargs2 = {'play-and-exit': True, 'intf': 'dummy', 'ignore-config': True, 'fullscreen': True, 'video-on-top': True, 'no-video-title-show': True, 'aout': 'alsa', 'no-sout-display-audio': True, 'qt-fullscreen-screennumber': 1, '_bg': True, '_no_out': True, '_no_err': True, '_no_pipe': True}
+            self._player_kwargs2 = {'play-and-exit': True, 'intf': 'dummy', 'ignore-config': True, 'fullscreen': True, 'video-on-top': True, 'no-video-title-show': True, 'no-audio': True, 'qt-fullscreen-screennumber': 1, '_bg': True, '_no_out': True, '_no_err': True, '_no_pipe': True}
 
         if duration and duration != 'N/A':
             self._player_args = ['timeout', VIDEO_TIMEOUT + int(duration.split('.')[0])] + self._player_args

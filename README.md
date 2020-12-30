@@ -21,6 +21,21 @@ The tl;dr for installing Screenly OSE on [Raspbian Lite](https://www.raspberrypi
 $ bash <(curl -sL https://raw.githubusercontent.com/HendryLeo/screenly-ose/production/install-ose.sh)
 ```
 
+You may need the following in your /boot/config.txt
+```
+hdmi_force_hotplug:0=1
+hdmi_force_hotplug:1=1
+hdmi_drive:0=2
+hdmi_drive:1=2
+```
+to enable HDMI hotplug (audio and video) in RPI 4
+
+For rpi < 4, just use
+```
+hdmi_force_hotplug=1
+hdmi_drive=2
+```
+
 **This installation will take 15 minutes to several hours**, depending on variables such as:
 
  * The Raspberry Pi hardware version

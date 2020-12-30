@@ -9,7 +9,7 @@ def remote_branch_available(branch):
 
     try:
         resp = requests_get(
-            'https://api.github.com/repos/screenly/screenly-ose/branches',
+            'https://api.github.com/repos/hendryleo/screenly-ose/branches',
             headers={
                 'Accept': 'application/vnd.github.loki-preview+json',
             },
@@ -34,7 +34,7 @@ def fetch_remote_hash(branch):
         return
 
     resp = requests_get(
-        'https://api.github.com/repos/screenly/screenly-ose/git/refs/heads/{}'.format(branch)
+        'https://api.github.com/repos/hendryleo/screenly-ose/git/refs/heads/{}'.format(branch)
     )
 
     if not resp.ok:

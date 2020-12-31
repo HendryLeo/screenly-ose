@@ -53,6 +53,42 @@
   tags:
     - touches_boot_partition
 
+- name: set required hdmi hotplug support
+  lineinfile:
+    dest: /boot/config.txt
+    regexp: ^hdmi_force_hotplug=
+    line: hdmi_force_hotplug=1
+  when: not is_berryboot
+  tags:
+    - touches_boot_partition
+
+- name: set required hdmi hotplug (for audio) support
+  lineinfile:
+    dest: /boot/config.txt
+    regexp: ^hdmi_drive=
+    line: hdmi_drive=2
+  when: not is_berryboot
+  tags:
+    - touches_boot_partition
+
+- name: set required hdmi2 hotplug (for rpi4) support
+  lineinfile:
+    dest: /boot/config.txt
+    regexp: ^hdmi_force_hotplug:1=
+    line: hdmi_force_hotplug:1=1
+  when: not is_berryboot
+  tags:
+    - touches_boot_partition
+
+- name: set required hdmi2 hotplug (for rpi4 audio) support
+  lineinfile:
+    dest: /boot/config.txt
+    regexp: ^hdmi_drive:1=
+    line: hdmi_drive:1=2
+  when: not is_berryboot
+  tags:
+    - touches_boot_partition
+
 - name: Backup kernel boot args
   copy:
     src: /boot/cmdline.txt

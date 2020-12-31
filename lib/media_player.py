@@ -4,6 +4,7 @@ import sh
 import vlc
 
 from settings import settings
+from lib.diagnostics import get_raspberry_code, get_raspberry_model
 
 VIDEO_TIMEOUT = 20  # secs
 
@@ -77,7 +78,7 @@ class VLCMediaPlayer(MediaPlayer):
     def play(self):
         settings.load()
         self._run = sh.Command(self._player_args[0])(*self._player_args[1:], **self._player_kwargs)
-        if settings['enable_second_screen']:
+        if settings['enable_second_screen'] and get_raspberry_model(get_raspberry_code()) == 'Model 4B':
             self._run2 = sh.Command(self._player_args[0])(*self._player_args[1:], **self._player_kwargs2)
 
     def stop(self):
@@ -88,7 +89,7 @@ class VLCMediaPlayer(MediaPlayer):
 
     def is_playing(self):
         settings.load()
-        if settings['enable_second_screen']:
+        if settings['enable_second_screen'] and get_raspberry_model(get_raspberry_code()) == 'Model 4B':
             return bool(self._run.process.alive or self._run2.process.alive)
         else:
             return bool(self._run.process.alive)
@@ -111,7 +112,10 @@ class OMXMediaPlayer(MediaPlayer):
                 audio_device_1 = 'alsa:hw:0'
                 audio_device_2 = 'alsa:hw:1'
             else:
-                audio_device_1 = 'alsa:hw:2'
+                if get_raspberry_model(get_raspberry_code()) == 'Model 4B':
+                    audio_device_1 = 'alsa:hw:2'
+                else:
+                    audio_device_1 = 'alsa:hw:1'
                 audio_device_2 = 'no-sound'
             
             self._player_args = ['omxplayer', uri]
@@ -131,7 +135,7 @@ class OMXMediaPlayer(MediaPlayer):
 
     def play(self):
         self._run = sh.Command(self._player_args[0])(*self._player_args[1:], **self._player_kwargs)
-        if settings['enable_second_screen']:
+        if settings['enable_second_screen'] and get_raspberry_model(get_raspberry_code()) == 'Model 4B':
             self._run2 = sh.Command(self._player_args[0])(*self._player_args[1:], **self._player_kwargs2)
 
     def stop(self):
@@ -142,7 +146,7 @@ class OMXMediaPlayer(MediaPlayer):
 
     def is_playing(self):
         settings.load()
-        if settings['enable_second_screen']:
+        if settings['enable_second_screen'] and get_raspberry_model(get_raspberry_code()) == 'Model 4B':
             return bool(self._run.process.alive or self._run2.process.alive)
         else:
             return bool(self._run.process.alive)

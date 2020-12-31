@@ -36,6 +36,15 @@ hdmi_force_hotplug=1
 hdmi_drive=2
 ```
 
+If rpi is turn on before your TV or monitor, default resolution will be quite low. You need to specify your desired resolution in /boot/config. The following is example for CEA 16 (HDMI 1080p), see https://www.raspberrypi.org/documentation/configuration/config-txt/video.md for the complete list
+```
+hdmi_group=1
+hdmi_mode=16
+hdmi_group:1=1
+hdmi_mode:1=16
+
+```
+
 **This installation will take 15 minutes to several hours**, depending on variables such as:
 
  * The Raspberry Pi hardware version
